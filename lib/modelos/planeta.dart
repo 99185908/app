@@ -1,4 +1,4 @@
-{
+class Planeta {
   int? id;
   String nome;
   double tamanho;

@@ -31,6 +31,14 @@ class _TelaPlanetaState extends State<TelaPlaneta> {
     super.dispose();
   }
 
+  void _submitform() {
+    if (_formKey.currentState!.validate()) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Salvo com sucesso')),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -66,22 +74,21 @@ class _TelaPlanetaState extends State<TelaPlaneta> {
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Por favor, insira uma distancia valida';
+                      return 'Por favor, insira um tamanho valido';
                     }
                     return null;
                   },
-                  
-                  ),
+                ),
                 SizedBox(height: 10.0),
                 TextFormField(
                   controller: _distanciaController,
-                 decoration: InputDecoration(
+                  decoration: InputDecoration(
                     labelText: 'Distancia (em km)',
                     border: OutlineInputBorder(),
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Por favor, insira um Tamanho valido';
+                      return 'Por favor, insira uma distancia valida';
                     }
                     return null;
                   },
@@ -102,7 +109,7 @@ class _TelaPlanetaState extends State<TelaPlaneta> {
                 ),
                 SizedBox(height: 20.0),
                 ElevatedButton(
-                  onPressed: () {}, //_submitform,
+                  onPressed: _submitform,
                   child: Text('salvar'),
                 ),
               ],
