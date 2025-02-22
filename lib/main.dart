@@ -1,15 +1,16 @@
-// ignore_for_file: duplicate_import
-
 import 'package:flutter/material.dart';
 import 'package:myapp/telas/tela_planeta.dart';
-import 'telas/tela_planeta.dart';
+import 'package:myapp/controle/ctrl_planeta.dart';
+import 'package:myapp/modelos/planeta.dart';
 
 void main() {
   runApp(const MyApp());
 }
 
+
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
+
 
   @override
   Widget build(BuildContext context) {
@@ -20,7 +21,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: TelaPlaneta(),
+      home:  MyHomePage(title: 'Planetas'),
     );
   }
 }
@@ -34,14 +35,13 @@ class MyHomePage extends StatefulWidget {
   State<MyHomePage> createState() => _MyHomePageState();
 }
 
-
 class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
+  late CtrlPlaneta _ctrlPlaneta;
 
-  void _incrementCounter() {
-    setState(() {
-      _counter++;
-    });
+  @override
+  void initState() {
+    super.initState();
+    _ctrlPlaneta = CtrlPlaneta();
   }
 
   @override
@@ -51,20 +51,51 @@ class _MyHomePageState extends State<MyHomePage> {
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         title: Text(widget.title),
       ),
-      body: const Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              'Text Example',
-             style: TextStyle(fontSize: 24),
-            ),
-          ],
-        ),
+      body: ListenableBuilder(
+        listenable: _ctrlPlaneta,
+        builder: (context, child) {
+          return FutureBuilder<List<Planeta>>(
+            future: _ctrlPlaneta.listarPlanetas(),
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const Center(child: CircularProgressIndicator());
+              } else if (snapshot.hasError) {
+                return Center(child: Text('Erro: ${snapshot.error}'));
+              } else if (snapshot.hasData) {
+                final planetas = snapshot.data!;
+                return ListView.builder(
+                  itemCount: planetas.length,
+                  itemBuilder: (context, index) {
+                    final planeta = planetas[index];
+                    return ListTile(
+                      title: Text(planeta.nome),
+                      subtitle:
+                          Text('Distância: ${planeta.distancia.toString()}'),
+                    );
+                  },
+                );
+              } else {
+                return const Center(child: Text('Nenhum planeta encontrado.'));
+              }
+            },
+          );
+        },
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
+        onPressed: () async {
+          Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) =>
+                      TelaPlaneta(ctrlPlaneta: _ctrlPlaneta))).then((value) {
+                        if(value == true){
+                           setState(() {
+                           });
+                        }
+
+                      });
+        },
+        tooltip: 'Editar/Criar Planeta',
         child: const Icon(Icons.add),
       ),
     );
